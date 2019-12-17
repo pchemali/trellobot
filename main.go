@@ -148,24 +148,29 @@ func main() {
 			}
 		case github.IssueCommentPayload:
 			p := payload.(github.IssueCommentPayload)
+			println("fired1")
 			processPR(r.Context(), client, p.Repository.Owner.Login, p.Repository.Name, int(p.Issue.Number))
 		case github.PullRequestReviewPayload:
 			p := payload.(github.PullRequestReviewPayload)
+			println("fired2")
 			processPR(r.Context(), client, p.Repository.Owner.Login, p.Repository.Name, int(p.PullRequest.Number))
 		case github.PullRequestReviewCommentPayload:
 			p := payload.(github.PullRequestReviewCommentPayload)
+			println("fired3")
 			processPR(r.Context(), client, p.Repository.Owner.Login, p.Repository.Name, int(p.PullRequest.Number))
 		case github.PushPayload:
 			p := payload.(github.PushPayload)
-
-			res, _, err := client.PullRequests.ListPullRequestsWithCommit(r.Context(), p.Repository.Owner.Login, p.Repository.Name, p.After, nil)
+			println("fired4")
+			res, body, err := client.PullRequests.ListPullRequestsWithCommit(r.Context(), p.Repository.Owner.Login, p.Repository.Name, p.After, nil)
 			if err != nil {
 				return
 			}
+			fmt.Println(body)
+			fmt.Printf("%v", p)
 			for _, pr := range res {
 				processPR(r.Context(), client, p.Repository.Owner.Login, p.Repository.Name, *pr.Number)
 			}
-		}
+		}	
 	})
 	http.ListenAndServe(":3000", nil)
 }
